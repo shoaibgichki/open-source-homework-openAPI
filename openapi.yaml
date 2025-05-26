@@ -1,0 +1,369 @@
+openapi: 3.0.3
+info:
+  title: Üniversite Kütüphane API'si
+  version: 1.0.0
+  description: Çevrim içi bir üniversite kütüphane sistemi için kitap, öğrenci ve borç alma işlemlerini yöneten RESTful API.
+servers:
+  - url: https://api.universite-kutuphane.com
+    description: Üretim sunucusu
+
+tags:
+  - name: Books
+    description: Kitaplarla ilgili işlemler
+  - name: Students
+    description: Öğrencilerle ilgili işlemler
+  - name: Loans
+    description: Ödünç alma işlemleri
+
+paths:
+  /books:
+    get:
+      tags: [Books]
+      summary: Tüm kitapları listele
+      description: Sistemdeki tüm kitapları sayfalı olarak döndürür.
+      parameters:
+        - name: page
+          in: query
+          description: Sayfa numarası
+          required: false
+          schema:
+            type: integer
+        - name: size
+          in: query
+          description: Sayfa boyutu
+          required: false
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Kitap listesi başarıyla getirildi.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+              example:
+                - id: "123e4567-e89b-12d3-a456-426614174000"
+                  title: "OpenAPI Temelleri"
+                  author: "Ahmet Yılmaz"
+                  isbn: "978-3-16-148410-0"
+                  publisher: "Bilim Yayınları"
+                  pageCount: 300
+                  stock: 10
+        500:
+          description: Sunucu hatası
+
+    post:
+      tags: [Books]
+      summary: Yeni kitap ekle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Book'
+      responses:
+        201:
+          description: Kitap başarıyla oluşturuldu.
+        400:
+          description: Geçersiz istek
+        500:
+          description: Sunucu hatası
+
+  /books/{id}:
+    get:
+      tags: [Books]
+      summary: Kitap bilgisi getir
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Kitap ID’si
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Kitap bulundu.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        404:
+          description: Kitap bulunamadı.
+
+    put:
+      tags: [Books]
+      summary: Kitap bilgilerini güncelle
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Kitap ID’si
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Book'
+      responses:
+        200:
+          description: Kitap güncellendi.
+        400:
+          description: Geçersiz veri
+        404:
+          description: Kitap bulunamadı.
+
+    delete:
+      tags: [Books]
+      summary: Kitap sil
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Kitap ID’si
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Kitap silindi.
+        404:
+          description: Kitap bulunamadı.
+
+  /students:
+    get:
+      tags: [Students]
+      summary: Tüm öğrencileri listele
+      responses:
+        200:
+          description: Öğrenci listesi başarıyla getirildi.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Student'
+
+    post:
+      tags: [Students]
+      summary: Yeni öğrenci ekle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Student'
+      responses:
+        201:
+          description: Öğrenci başarıyla eklendi.
+        400:
+          description: Geçersiz istek
+
+  /students/{id}:
+    get:
+      tags: [Students]
+      summary: Öğrenci bilgisi getir
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Öğrenci ID’si
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Öğrenci bulundu.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        404:
+          description: Öğrenci bulunamadı.
+
+    put:
+      tags: [Students]
+      summary: Öğrenci bilgilerini güncelle
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Öğrenci ID’si
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Student'
+      responses:
+        200:
+          description: Öğrenci güncellendi.
+        400:
+          description: Geçersiz veri
+
+    delete:
+      tags: [Students]
+      summary: Öğrenci sil
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Öğrenci ID’si
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Öğrenci silindi.
+        404:
+          description: Öğrenci bulunamadı.
+
+  /loans:
+    get:
+      tags: [Loans]
+      summary: Tüm ödünç kayıtlarını getir
+      responses:
+        200:
+          description: Ödünç listesi başarıyla getirildi.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Loan'
+
+    post:
+      tags: [Loans]
+      summary: Kitap ödünç al
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Loan'
+      responses:
+        201:
+          description: Ödünç kaydı oluşturuldu.
+        400:
+          description: Geçersiz istek
+
+  /loans/{id}:
+    get:
+      tags: [Loans]
+      summary: Ödünç bilgisi getir
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Ödünç ID’si
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Ödünç bulundu.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Loan'
+        404:
+          description: Ödünç bulunamadı.
+
+  /loans/{id}/return:
+    patch:
+      tags: [Loans]
+      summary: Kitap iade et
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Ödünç ID’si
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Kitap iade edildi.
+        400:
+          description: Geçersiz istek
+        404:
+          description: Ödünç kaydı bulunamadı.
+
+components:
+  schemas:
+    Book:
+      type: object
+      required: [id, title, author, isbn, publisher, pageCount, stock]
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        author:
+          type: string
+        isbn:
+          type: string
+          format: isbn
+        publisher:
+          type: string
+        pageCount:
+          type: integer
+        stock:
+          type: integer
+
+    Student:
+      type: object
+      required: [id, name, studentNumber, email, isActive]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        studentNumber:
+          type: string
+        email:
+          type: string
+          format: email
+        isActive:
+          type: boolean
+
+    Loan:
+      type: object
+      required: [id, studentId, bookId, loanDate, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        studentId:
+          type: string
+        bookId:
+          type: string
+        loanDate:
+          type: string
+          format: date
+        returnDate:
+          type: string
+          format: date
+          nullable: true
+        status:
+          type: string
+          enum: [ongoing, returned, late]
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - bearerAuth: []
